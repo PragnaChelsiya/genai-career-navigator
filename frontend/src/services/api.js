@@ -1,0 +1,27 @@
+import axios from "axios";
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export async function analyzeCareer(data) {
+  const response = await api.post("/analyze", data);
+  return response.data;
+}
+
+export async function generateAIPlan(data) {
+  const response = await api.post("/generate-ai", data);
+  return response.data;
+}
+
+export async function getRoles() {
+  const response = await api.get("/roles");
+  return response.data;
+}
+
+export default api;
