@@ -3,6 +3,7 @@ import json
 import re
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from backend.analysis.nlp_matcher import (
@@ -330,6 +331,7 @@ def parse_skills(value):
 # 3050 ROW DATASET
 # ============================================================
 
+
 def load_main_dataset():
 
     if not PARQUET_FILE.exists():
@@ -354,40 +356,40 @@ def load_main_dataset():
 
     result = pd.DataFrame()
 
+    # Job titles
     result["Job Title"] = (
         df["title"]
         .fillna("")
         .astype(str)
     )
 
+    # Convert Python lists and NumPy arrays
+    # into pipe-separated skill strings
     result["Skills"] = (
         df["required_skills"]
-        .fillna("")
         .apply(
-            lambda x:
-            " | ".join(x)
-            if isinstance(x, list)
-            else str(x)
+            lambda x: " | ".join(
+                str(skill) for skill in x
+            )
+            if isinstance(x, (list, np.ndarray))
+            else str(x) if pd.notna(x) else ""
         )
     )
 
+    # Job descriptions
     result["Job Description"] = (
         df["job_description"]
         .fillna("")
         .astype(str)
     )
 
-    result["Source"] = (
-        "3050-row dataset"
-    )
+    # Dataset source
+    result["Source"] = "3050-row dataset"
 
     return result
-
-
 # ============================================================
 # 207 ROLE JSON DATASET
 # ============================================================
-
 def load_it_roles_dataset():
 
     if not IT_ROLES_FILE.exists():
